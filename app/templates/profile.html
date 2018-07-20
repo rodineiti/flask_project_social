@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} Dashboard {% endblock %}
+{% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Profile</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">User Profile</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">            
+          <!-- Profile Image -->
+          <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+              <div class="text-center">
+                {% if usuario.image %}
+                <img class="profile-user-img img-fluid img-circle"
+                     src="{{url_for('static', filename='uploads/profile/')}}{{usuario.image}}"
+                     alt="User profile picture">
+                {% endif %}
+              </div>
+              
+              <h3 class="profile-username text-center">{{usuario.name}}</h3>
+
+              <p class="text-muted text-center">Software Engineer</p>
+
+              {% if usuario.id == current_user.id %}
+              <div class="row">
+                    <form class="form-horizontal" method="post" action="{{ url_for('imgprofile', id=usuario.id) }}" enctype="multipart/form-data">
+                        {{ form.csrf_token }}
+                      <div class="box-body">
+                        <div class="form-group">
+                            <input type="file" class="form-control" name="file" id="file">
+                        </div>
+                      </div>
+                      <!-- /.box-body -->
+                      <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">Upload</button>
+                      </div>
+                      <!-- /.box-footer -->
+                    </form>
+              </div>
+              {% endif %}
+
+              <br>
+
+              <ul class="list-group list-group-unbordered mb-3">
+                <li class="list-group-item">
+                  <b>Followers</b> <a class="float-right">{{totalseguidores}}</a>
+                </li>
+                <li class="list-group-item">
+                  <b>Following</b> <a class="float-right">{{totalseguindo}}</a>
+                </li>
+              </ul>
+
+              {% if usuario.id != current_user.id %}
+                {% if seguindo == False %}
+                    <a class="btn btn-primary btn-block" href="{{ url_for('follow_post', follower_id=usuario.id) }}">Follow</a>
+                {% else %}
+                    <a class="btn btn-danger btn-block" href="{{ url_for('unfollow_post', follower_id=usuario.id) }}">UnFollow</a>
+                {% endif %}
+              {% endif %}
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+
+          
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+          <div class="card">
+            <div class="card-header p-2">
+              <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Activity</a></li>
+              </ul>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+              <div class="tab-content">
+                <div class="active tab-pane" id="activity">
+                  
+                  {% for post in posts %}
+                  <!-- Post -->
+                  <div class="post">
+                    <div class="user-block">
+                      <span class="username">
+                        <a href="#">{{post.title}}</a>
+                        {% if usuario.id == current_user.id %}
+                        <a href="{{ url_for('del_post', id=post.id) }}" class="float-right btn-tool"><i class="fa fa-times"></i></a>
+                        {% endif %}
+                      </span>
+                    </div>
+                    <!-- /.user-block -->
+                    <p>
+                      {{post.content}}
+                    </p>                    
+                  </div>
+                  <!-- /.post -->                  
+                  {% endfor %}
+
+                </div>
+                <!-- /.tab-pane -->
+              </div>
+              <!-- /.tab-content -->
+            </div><!-- /.card-body -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+  <!-- /.content -->
+  {% endblock %}
