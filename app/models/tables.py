@@ -30,6 +30,7 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     user = db.relationship('User', foreign_keys=user_id)
+    comments = db.relationship('Comment', backref='posts',lazy='dynamic')
 
     def __init__(self, title, content, user_id, image):
         self.title = title

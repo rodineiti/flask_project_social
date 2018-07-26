@@ -58,6 +58,7 @@
                     <a class="btn btn-primary pull-right" href="{{ url_for('edit_post', id=post.id) }}">Edit</a>
                     <a class="btn btn-danger pull-right" href="{{ url_for('del_post', id=post.id) }}">Delete</a>
                     {% endif %}
+                    <span class="float-left text-muted">{{ post.comments.count() }} comments</span>
                 </div>
                 <!-- /.card-footer-->                  
               </div>
