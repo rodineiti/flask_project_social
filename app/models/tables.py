@@ -76,3 +76,17 @@ class Comment(db.Model):
 
     def __rep__(self):
         return "<Comment %r>" % self.id
+
+class Message(db.Model):
+    __tablename__ = "messages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String)
+    message = db.Column(db.String)
+
+    def __init__(self, username, message):
+        self.username = username
+        self.message = message
+    
+    def __rep__(self):
+        return "<Message %r>" % self.message

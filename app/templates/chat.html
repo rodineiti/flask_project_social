@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} Dashboard {% endblock %}
+{% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Posts</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">View Post</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <div class="row">
+      <div class="col-md-8">
+        <!-- DIRECT CHAT PRIMARY -->
+        <div class="card card-primary card-outline direct-chat direct-chat-primary">
+          <div class="card-header">
+            <h3 class="card-title">Chat</h3>
+
+            <div class="card-tools">
+              <span data-toggle="tooltip" title="3 New Messages" class="badge bg-primary">3</span>
+              <button type="button" class="btn btn-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts"
+                      data-widget="chat-pane-toggle">
+                <i class="fa fa-comments"></i></button>
+              <button type="button" class="btn btn-tool" data-widget="remove"><i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+            <div class="direct-chat-messages" id="content">
+              {% for message in messages %}
+                {% if message.username != current_user.name %}
+                <div class="direct-chat-msg">
+                  <div class="direct-chat-info clearfix">
+                    <span class="direct-chat-name float-left">{{ message.username }}</span>
+                  </div>
+                  <div class="direct-chat-text">
+                      {{ message.message }}
+                  </div>
+                </div>
+                {% else %}
+                <div class="direct-chat-msg right">
+                  <div class="direct-chat-info clearfix">
+                    <span class="direct-chat-name float-right">{{ message.username }}</span>
+                  </div>
+                  <div class="direct-chat-text">
+                      {{ message.message }}
+                  </div>
+                </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer">
+              <div class="input-group">
+                <input type="text" id="message" name="message" placeholder="Type Message ..." class="form-control">
+                <span class="input-group-append">
+                  <a class="btn btn-primary" id="chat_btn">Send</a>
+                </span>
+              </div>            
+          </div>
+          <!-- /.card-footer-->
+        </div>
+        <!--/.direct-chat -->
+      </div>
+    </div>
+
+  </section>
+  <!-- /.content -->
+  {% endblock %}
+  {% block pusher %}
+  <script>
+    $(function() {
+
+      $('#chat_btn').on('click', function() {
+        let message = $('#message').val();
+        if (message != '') {
+          $.post('/message', { 'message': message }, function(result) {            
+            $('#message').val("");
+          });
+        } else {
+          alert('Informe a mensagem');
+        }
+      });
+
+      // Enable pusher logging - don't include this in production
+      Pusher.logToConsole = true;
+
+      var pusher = new Pusher('4574e10e7f8be933f7f5', {
+        cluster: 'us2',
+        encrypted: true
+      });
+
+      var channel = pusher.subscribe('chat-channel');
+      channel.bind('new-message', function(data) {
+        let name = data.username;
+        let message = data.message;
+        let message_template = `
+          <div class="direct-chat-msg right">
+            <div class="direct-chat-info clearfix">
+              <span class="direct-chat-name float-right">${name}</span>
+            </div>
+            <div class="direct-chat-text">
+                ${message}
+            </div>
+          </div>`;
+        $('#content').append(message_template);
+      });
+    });
+  </script>
+  {% endblock %}

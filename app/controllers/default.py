@@ -1,14 +1,22 @@
-import os
-from flask import render_template, flash, redirect, url_for, request
+import os, pusher
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from werkzeug.utils import secure_filename
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db, lm
 from sqlalchemy import tuple_
 
-from app.models.tables import User, Post, Follow, Comment
+from app.models.tables import User, Post, Follow, Comment, Message
 from app.models.forms import LoginForm, PostForm, UserForm
 
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg','gif','bmp'])
+
+pusher_client = pusher.Pusher(
+  app_id='567839',
+  key='4574e10e7f8be933f7f5',
+  secret='3bf0df1c2020dc43fbb8',
+  cluster='us2',
+  ssl=True
+)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -43,11 +51,7 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-    posts = Post.query.all()
-    seguindo = Follow.query.filter_by(user_id=current_user.id).all()
-    for item in seguindo:
-        print(item.follower_id)
-        
+    posts = Post.query.all()    
     return render_template("index.html", posts=posts)
 
 @app.route("/addpost")
@@ -206,3 +210,29 @@ def comment(id):
         flash("Comentário adicionado com sucesso")
 
     return redirect(url_for("show", id=post.id))
+
+@app.route("/chat", methods=['GET'])
+@login_required
+def chat():
+    messages = Message.query.all()  
+    return render_template("chat.html", messages=messages)
+
+@app.route("/message", methods=['POST'])
+@login_required
+def message():
+    
+    try:
+        username = current_user.name
+        message = request.form.get('message')
+
+        message_add = Message(username=username, message=message)
+        db.session.add(message_add)
+        db.session.commit()
+
+        pusher_client.trigger('chat-channel', 'new-message', { 'username': username, 'message': message })
+
+        #return jsonify({ 'result': 'success', 'data': { 'username': username, 'message': message } })
+
+        return jsonify({ 'result': 'success' })
+    except:
+        return jsonify({ 'result': 'error' })
