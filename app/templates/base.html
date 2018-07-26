@@ -65,7 +65,9 @@
       <!-- Sidebar user (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{ url_for('static', filename='AdminLTE-3.0.0-alpha.2/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
+          {% if current_user.image %}
+          <img src="{{url_for('static', filename='uploads/profile/')}}{{current_user.image}}" class="img-circle elevation-2" alt="User Image">
+          {% endif %}
         </div>
         <div class="info">
           <a href="{{ url_for('profile', id=current_user.id) }}" class="d-block">{{ current_user.name }}</a>

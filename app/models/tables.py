@@ -56,3 +56,22 @@ class Follow(db.Model):
 
     def __rep__(self):
         return "<Follow %r>" % self.id
+
+class Comment(db.Model):
+    __tablename__ = "comments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    body = db.Column(db.Text)
+
+    user = db.relationship('User', foreign_keys=user_id)
+    post = db.relationship('Post', foreign_keys=post_id)
+
+    def __init__(self, user_id, post_id, body):
+        self.user_id = user_id
+        self.post_id = post_id
+        self.body = body
+
+    def __rep__(self):
+        return "<Comment %r>" % self.id

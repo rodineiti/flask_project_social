@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db, lm
 from sqlalchemy import tuple_
 
-from app.models.tables import User, Post, Follow
+from app.models.tables import User, Post, Follow, Comment
 from app.models.forms import LoginForm, PostForm, UserForm
 
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg','gif','bmp'])
@@ -185,3 +185,24 @@ def imgprofile(id):
     flash("Imagem enviada com sucesso")
     
     return redirect(url_for("profile", id=usuario.id, form=form))
+
+@app.route("/show/<id>", methods=['GET'])
+@login_required
+def show(id):
+    post = Post.query.filter_by(id=id).first()
+    comments = Comment.query.filter_by(post_id=post.id).all()
+    
+    return render_template("show.html", post=post, comments=comments)
+
+@app.route("/comment/<id>", methods=['POST'])
+@login_required
+def comment(id):
+    post = Post.query.filter_by(id=id).first()
+    body = request.form.get('body')
+    if body:
+        comment = Comment(user_id=current_user.id, post_id=post.id, body=body)
+        db.session.add(comment)
+        db.session.commit()
+        flash("Comentário adicionado com sucesso")
+
+    return redirect(url_for("show", id=post.id))

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ super() }} Dashboard {% endblock %}
+{% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Posts</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">View Post</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <div class="row">
+      <div class="col-md-6">
+        <!-- Box Comment -->
+        <div class="card card-widget">
+          <div class="card-header">
+            <div class="user-block">
+              {% if post.user.image %}
+              <img class="img-circle img-bordered-sm" src="{{url_for('static', filename='uploads/profile/')}}{{post.user.image}}" alt="User Image">
+              {% endif %}
+              <span class="username"><a href="{{ url_for('profile', id=post.user.id) }}">{{post.user.name}}</a></span>
+              <span class="description">{{post.title}}</span>
+            </div>
+            <!-- /.user-block -->
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Mark as read">
+                <i class="fa fa-circle-o"></i></button>
+              <button type="button" class="btn btn-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-tool" data-widget="remove"><i class="fa fa-times"></i>
+              </button>
+            </div>
+            <!-- /.card-tools -->
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body">
+            <!-- post text -->
+            {% if post.image %}
+            <img class="img-fluid pad" src="{{url_for('static', filename='uploads/')}}{{post.image}}" alt="Photo">
+            {% endif %}
+            <p>{{post.content}}</p>
+
+          </div>
+          <!-- /.card-body -->          
+        </div>
+        <!-- /.card -->
+      </div>
+      
+      <div class="col-md-6">
+          <!-- Box Comment -->
+          <div class="card card-widget">
+            <div class="card-footer card-comments">
+              
+              {% for comment in comments %}
+              <div class="card-comment">
+                {% if comment.user.image %}
+                <!-- User image -->
+                <img class="img-circle img-sm" src="{{url_for('static', filename='uploads/profile/')}}{{comment.user.image}}" alt="User Image">
+                {% endif %}
+                <div class="comment-text">
+                  <span class="username">{{comment.user.name}}</span><!-- /.username -->
+  
+                  {{comment.body}}
+  
+                </div>
+                <!-- /.comment-text -->
+              </div>
+              <!-- /.card-comment -->  
+              {% endfor %}
+
+            </div>
+            <!-- /.card-footer -->
+            <div class="card-footer">
+              <form method="post" action="{{ url_for('comment', id=post.id) }}">
+                {% if current_user.image %}
+                <img class="img-fluid img-circle img-sm"
+                    src="{{url_for('static', filename='uploads/profile/')}}{{current_user.image}}"
+                    alt="User profile picture">
+                {% endif %}
+                <!-- .img-push is used to add margin to elements next to floating images -->
+                <div class="img-push">
+                  <input type="text" class="form-control form-control-sm" name="body" id="body" placeholder="Press enter to post comment">
+                </div>
+              </form>
+            </div>
+            <!-- /.card-footer -->
+          </div>
+          <!-- /.card -->
+        </div>
+    </div>
+
+  </section>
+  <!-- /.content -->
+  {% endblock %}

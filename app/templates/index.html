@@ -49,16 +49,17 @@
                   {% if post.image %}
                   <img class="img-fluid pad" src="{{url_for('static', filename='uploads/')}}{{post.image}}" alt="Photo">
                   {% endif %}
-                  <p>{{post.content}}</p>                  
+                  <p>{{post.content}}</p>
                 </div>
                 <!-- /.card-body -->    
-                {% if post.user.id == current_user.id %}
                 <div class="card-footer">
+                    <a class="btn btn-info pull-right" href="{{ url_for('show', id=post.id) }}">Show</a>
+                    {% if post.user.id == current_user.id %}
                     <a class="btn btn-primary pull-right" href="{{ url_for('edit_post', id=post.id) }}">Edit</a>
                     <a class="btn btn-danger pull-right" href="{{ url_for('del_post', id=post.id) }}">Delete</a>
+                    {% endif %}
                 </div>
-                <!-- /.card-footer-->  
-                {% endif %}           
+                <!-- /.card-footer-->                  
               </div>
         </div>
     {% endfor %}
