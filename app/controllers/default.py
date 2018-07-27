@@ -11,11 +11,11 @@ from app.models.forms import LoginForm, PostForm, UserForm
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg','gif','bmp'])
 
 pusher_client = pusher.Pusher(
-  app_id='567839',
-  key='4574e10e7f8be933f7f5',
-  secret='3bf0df1c2020dc43fbb8',
-  cluster='us2',
-  ssl=True
+  app_id=app.config['PUSHER_APP_ID'],
+  key=app.config['PUSHER_KEY'],
+  secret=app.config['PUSHER_SECRET'],
+  cluster=app.config['PUSHER_CLUSTER'],
+  ssl=app.config['PUSHER_SSL']
 )
 
 def allowed_file(filename):

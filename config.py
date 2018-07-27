@@ -12,3 +12,9 @@ SECRET_KEY = 'hashsecurity'
 UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads/')
 UPLOAD_FOLDER_PROFILE = os.path.join(basedir, 'app/static/uploads/profile/')
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+PUSHER_APP_ID = ''
+PUSHER_KEY = ''
+PUSHER_SECRET = ''
+PUSHER_CLUSTER = ''
+PUSHER_SSL = True
