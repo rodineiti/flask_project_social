@@ -223,13 +223,18 @@ def message():
     
     try:
         username = current_user.name
+        image = ''
+
+        if current_user.image:
+            image = current_user.image
+
         message = request.form.get('message')
 
-        message_add = Message(username=username, message=message)
+        message_add = Message(username=username, message=message, image=image)
         db.session.add(message_add)
         db.session.commit()
 
-        pusher_client.trigger('chat-channel', 'new-message', { 'username': username, 'message': message })
+        pusher_client.trigger('chat-channel', 'new-message', { 'username': username, 'image': image, 'message': message })
 
         #return jsonify({ 'result': 'success', 'data': { 'username': username, 'message': message } })
 

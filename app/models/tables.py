@@ -83,10 +83,12 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String)
     message = db.Column(db.String)
+    image = db.Column(db.String)
 
-    def __init__(self, username, message):
+    def __init__(self, username, message, image):
         self.username = username
         self.message = message
+        self.image = image
     
     def __rep__(self):
         return "<Message %r>" % self.message

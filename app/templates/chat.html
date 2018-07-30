@@ -55,6 +55,7 @@
                   <div class="direct-chat-info clearfix">
                     <span class="direct-chat-name float-left">{{ message.username }}</span>
                   </div>
+                  <img class="direct-chat-img" src="{{url_for('static', filename='uploads/profile/')}}{{message.image}}" alt="Message User Image">
                   <div class="direct-chat-text">
                       {{ message.message }}
                   </div>
@@ -64,6 +65,7 @@
                   <div class="direct-chat-info clearfix">
                     <span class="direct-chat-name float-right">{{ message.username }}</span>
                   </div>
+                  <img class="direct-chat-img" src="{{url_for('static', filename='uploads/profile/')}}{{message.image}}" alt="Message User Image">
                   <div class="direct-chat-text">
                       {{ message.message }}
                   </div>
@@ -93,7 +95,7 @@
   {% block pusher %}
   <script>
     $(function() {
-      $('#content').animate({scrollTop: 1024});
+      $('#content').animate({scrollTop: 2048});
       $('#chat_btn').on('click', function() {
         let message = $('#message').val();
         if (message != '') {
@@ -109,7 +111,7 @@
       Pusher.logToConsole = true;
 
       var pusher = new Pusher('', {
-        cluster: '',
+        cluster: 'us2',
         encrypted: true
       });
 
@@ -117,17 +119,19 @@
       channel.bind('new-message', function(data) {
         let name = data.username;
         let message = data.message;
+        let image = data.image;
         let message_template = `
           <div class="direct-chat-msg right">
             <div class="direct-chat-info clearfix">
               <span class="direct-chat-name float-right">${name}</span>
             </div>
+            <img class="direct-chat-img" src="{{url_for('static', filename='uploads/profile/')}}${image}" alt="Message User Image">
             <div class="direct-chat-text">
                 ${message}
             </div>
           </div>`;
         $('#content').append(message_template);
-        $('#content').animate({scrollTop: 1024});
+        $('#content').animate({scrollTop: 2048});
       });
     });
   </script>
