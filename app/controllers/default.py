@@ -32,7 +32,7 @@ def login():
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and user.password == form.password.data:
+        if user and User.validate_login(user.password, form.password.data):
             login_user(user)
             return redirect(url_for("index"))
             flash("Logged in")
@@ -52,6 +52,7 @@ def register():
         #else:
         #    flash("Invalid register.")
         user = User(username=form.username.data, password=form.password.data, name=form.name.data, email=form.email.data)
+        user.hash_password(password = form.password.data)
         db.session.add(user)
         db.session.commit()
         flash("Usuário criado com sucesso")
