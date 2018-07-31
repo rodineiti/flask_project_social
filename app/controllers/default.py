@@ -7,7 +7,7 @@ from sqlalchemy import tuple_
 from flask_mail import Message as MSGMAIL
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
-from app.models.tables import User, Post, Follow, Comment, Message
+from app.models.tables import User, Post, Follow, Comment, Message, LikePost
 from app.models.forms import LoginForm, PostForm, UserForm
 
 urlSafeSerializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -36,7 +36,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter(User.username==form.username.data).filter(User.token=='').first()
+        user = User.query.filter(User.username==form.username.data).filter(User.token==None).first()
         if user and User.validate_login(user.password, form.password.data):
             login_user(user)
             return redirect(url_for("index"))
@@ -85,7 +85,7 @@ def confirm_email(token):
         email = urlSafeSerializer.loads(token, salt='email-confirm', max_age=3600)
         user = User.query.filter(User.email==email).filter(User.token==token).first()
         if user:
-            user.token = ''
+            user.token = None
             db.session.add(user)
             db.session.commit()
             flash("Conta ativada com sucesso")
@@ -106,7 +106,7 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-    posts = Post.query.all()    
+    posts = Post.query.all()
     return render_template("index.html", posts=posts)
 
 @app.route("/addpost")
@@ -250,8 +250,31 @@ def imgprofile(id):
 def show(id):
     post = Post.query.filter_by(id=id).first()
     comments = Comment.query.filter_by(post_id=post.id).all()
+
+    like_user_post = LikePost.query.filter(LikePost.user_id==current_user.id, LikePost.post_id==post.id).first()
+
+    return render_template("show.html", post=post, comments=comments, like_user_post=like_user_post)
+
+@app.route("/like_post/<post_id>", methods=['GET'])
+@login_required
+def like_post(post_id):
+    like = LikePost(user_id=current_user.id, post_id=post_id)
+    db.session.add(like)
+    db.session.commit()
+    flash("Curtido com sucesso")
     
-    return render_template("show.html", post=post, comments=comments)
+    return redirect(url_for("show", id=post_id))
+
+@app.route("/unlike_post/<post_id>", methods=['GET'])
+@login_required
+def unlike_post(post_id):
+    unlike = LikePost.query.filter(LikePost.user_id==current_user.id, LikePost.post_id==post_id).first()
+    if unlike:
+        db.session.delete(unlike)
+        db.session.commit()
+    flash("Descurtido com sucesso")
+    
+    return redirect(url_for("show", id=post_id))
 
 @app.route("/comment/<id>", methods=['POST'])
 @login_required

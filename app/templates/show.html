@@ -53,6 +53,12 @@
             {% endif %}
             <p>{{post.content}}</p>
 
+            {% if like_user_post == None %}
+            <a class="btn btn-default btn-sm" href="{{ url_for('like_post', post_id=post.id) }}"><i class="fa fa-thumbs-o-up"></i> Like</a>
+            {% else %}
+            <a class="btn btn-primary btn-sm" href="{{ url_for('unlike_post', post_id=post.id) }}"><i class="fa fa-thumbs-o-up"></i> UnLike</a>
+            {% endif %}            
+
           </div>
           <!-- /.card-body -->          
         </div>

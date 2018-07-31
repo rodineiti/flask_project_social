@@ -42,6 +42,7 @@ class Post(db.Model):
 
     user = db.relationship('User', foreign_keys=user_id)
     comments = db.relationship('Comment', backref='posts',lazy='dynamic')
+    likes = db.relationship('LikePost', backref='likes_post',lazy='dynamic')
 
     def __init__(self, title, content, user_id, image):
         self.title = title
@@ -103,3 +104,20 @@ class Message(db.Model):
     
     def __rep__(self):
         return "<Message %r>" % self.message
+
+class LikePost(db.Model):
+    __tablename__ = "likes_post"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    
+    user = db.relationship('User', foreign_keys=user_id)
+    post = db.relationship('Post', foreign_keys=post_id)
+
+    def __init__(self, user_id, post_id):
+        self.user_id = user_id
+        self.post_id = post_id
+
+    def __rep__(self):
+        return "<LikePost %r>" % self.id
