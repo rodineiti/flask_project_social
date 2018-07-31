@@ -2,11 +2,15 @@ import os, pusher
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from werkzeug.utils import secure_filename
 from flask_login import login_user, logout_user, login_required, current_user
-from app import app, db, lm
+from app import app, db, lm, mail
 from sqlalchemy import tuple_
+from flask_mail import Message as MSGMAIL
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 from app.models.tables import User, Post, Follow, Comment, Message
 from app.models.forms import LoginForm, PostForm, UserForm
+
+urlSafeSerializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 ALLOWED_EXTENSIONS = set(['png','jpg','jpeg','gif','bmp'])
 
@@ -28,16 +32,17 @@ def load_user(id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter(User.username==form.username.data).filter(User.token=='').first()
         if user and User.validate_login(user.password, form.password.data):
             login_user(user)
             return redirect(url_for("index"))
             flash("Logged in")
         else:
-            flash("Invalid login.")
+            flash("Login inválido ou sua conta não foi ativada.")
     
     return render_template('login.html', form=form)
 
@@ -46,19 +51,50 @@ def register():
     form = UserForm()
 
     if form.validate_on_submit():
-        #user = User.query.filter_by(username=form.username.data).first()
-        #if user:
-        #    flash("Usuário já existente")
-        #else:
-        #    flash("Invalid register.")
+        existsUsername = User.query.filter_by(username=form.username.data).first()
+        if existsUsername:
+            flash("Usuário já existente com este username")
+            return redirect(url_for("index"))
+
+        existsEmail = User.query.filter_by(email=form.email.data).first()
+        if existsEmail:
+            flash("Usuário já existente com este e-mail")
+            return redirect(url_for("index"))
+        
+        token = urlSafeSerializer.dumps(form.email.data, salt='email-confirm')
+        
         user = User(username=form.username.data, password=form.password.data, name=form.name.data, email=form.email.data)
         user.hash_password(password = form.password.data)
+        user.set_token(token = token)
         db.session.add(user)
         db.session.commit()
+
+        msg = MSGMAIL('Confirm Email', sender=app.config['MAIL_USERNAME'], recipients=[form.email.data])
+        link = url_for('confirm_email', token=token, _external=True)
+        msg.body = 'Seu link para validação é {}'.format(link)
+        mail.send(msg)
+
         flash("Usuário criado com sucesso")
         return redirect(url_for("index"))
     
     return render_template('register.html', form=form)
+
+@app.route('/confirm_email/<token>')
+def confirm_email(token):
+    try:
+        email = urlSafeSerializer.loads(token, salt='email-confirm', max_age=3600)
+        user = User.query.filter(User.email==email).filter(User.token==token).first()
+        if user:
+            user.token = ''
+            db.session.add(user)
+            db.session.commit()
+            flash("Conta ativada com sucesso")
+            return redirect(url_for("index"))
+        else:
+            flash("Erro, conta não encontrada ou conta já esta ativa.")
+            return redirect(url_for("index"))
+    except SignatureExpired:
+        return '<h1>Este token expirou!</h1>'
 
 @app.route('/logout')
 def logout():
@@ -254,8 +290,6 @@ def message():
         db.session.commit()
 
         pusher_client.trigger('chat-channel', 'new-message', { 'username': username, 'image': image, 'message': message })
-
-        #return jsonify({ 'result': 'success', 'data': { 'username': username, 'message': message } })
 
         return jsonify({ 'result': 'success' })
     except:

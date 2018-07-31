@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     image = db.Column(db.String)
+    token = db.Column(db.String)
 
     def __init__(self, username, password, name, email):
         self.username = username
@@ -26,6 +27,9 @@ class User(UserMixin, db.Model):
 
     def validate_login(password_user, password):
         return check_password_hash(password_user, password)
+
+    def set_token(self, token):
+        self.token = token
 
 class Post(db.Model):
     __tablename__ = "posts"
