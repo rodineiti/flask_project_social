@@ -13,15 +13,15 @@ UPLOAD_FOLDER = os.path.join(basedir, 'app/static/uploads/')
 UPLOAD_FOLDER_PROFILE = os.path.join(basedir, 'app/static/uploads/profile/')
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
-PUSHER_APP_ID = '567839'
-PUSHER_KEY = '4574e10e7f8be933f7f5'
-PUSHER_SECRET = '3bf0df1c2020dc43fbb8'
+PUSHER_APP_ID = ''
+PUSHER_KEY = ''
+PUSHER_SECRET = ''
 PUSHER_CLUSTER = 'us2'
 PUSHER_SSL = True
 
-MAIL_SERVER = 'mail.rdndeveloper.com'
+MAIL_SERVER = ''
 MAIL_PORT = 465
-MAIL_USERNAME = 'contact@rdndeveloper.com'
-MAIL_PASSWORD = '4~bz=7~K}85o'
+MAIL_USERNAME = ''
+MAIL_PASSWORD = ''
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
