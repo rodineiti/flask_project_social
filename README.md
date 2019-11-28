@@ -3,19 +3,20 @@ Rede Social simples com Microframework Flask em Python
 
 # Setar as credenciais do pusher e email
 
-Em config.py - adicionar suas credenciais:
-PUSHER_APP_ID = ''
-PUSHER_KEY = ''
-PUSHER_SECRET = ''
-PUSHER_CLUSTER = 'us2'
-PUSHER_SSL = True
+--Em config.py - adicionar suas credenciais:
 
-MAIL_SERVER = ''
-MAIL_PORT = 465
-MAIL_USERNAME = ''
-MAIL_PASSWORD = ''
-MAIL_USE_TLS = False
-MAIL_USE_SSL = True
+--PUSHER_APP_ID = ''
+--PUSHER_KEY = ''
+--PUSHER_SECRET = ''
+--PUSHER_CLUSTER = 'us2'
+--PUSHER_SSL = True
+
+--MAIL_SERVER = ''
+--MAIL_PORT = 465
+--MAIL_USERNAME = ''
+--MAIL_PASSWORD = ''
+--MAIL_USE_TLS = False
+--MAIL_USE_SSL = True
 
 # Comandos - testado no linux - em um ambiente online gitpod.io
 
