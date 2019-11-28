@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER Rodinei Teixeira <rodinei.texeira@atitude.com.br>
+MAINTAINER Rodinei Teixeira <rodineiguitar@gmail.com.br>
 
 RUN apt-get update -y && \
     apt-get install -y python-pip python-dev
